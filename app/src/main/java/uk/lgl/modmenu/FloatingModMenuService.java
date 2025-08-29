@@ -92,7 +92,7 @@ public class FloatingModMenuService extends Service {
     String NumberTxtColor = "#66BB6A";                              // Premium green for numbers
     //********************************************************************//
     RelativeLayout mCollapsed, mRootContainer;
-    LinearLayout mExpanded, patches, mSettings, mCollapse;
+    LinearLayout mExpanded, patches, mSettings, mCollapse, mThinBar; // Added thin bar for ImGui style
     LinearLayout.LayoutParams scrlLLExpanded, scrlLL;
     WindowManager mWindowManager;
     WindowManager.LayoutParams params;
@@ -179,8 +179,10 @@ public class FloatingModMenuService extends Service {
         startimage.setOnTouchListener(onTouchListener());
         startimage.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                // ImGui-style: show thin bar first
                 mCollapsed.setVisibility(View.GONE);
-                mExpanded.setVisibility(View.VISIBLE);
+                mThinBar.setVisibility(View.VISIBLE);
+                mExpanded.setVisibility(View.GONE);
             }
         });
 
@@ -201,35 +203,71 @@ public class FloatingModMenuService extends Service {
         wView.getSettings().setAppCacheEnabled(true);
         wView.setOnTouchListener(onTouchListener());
 
-        //********** Settings icon **********
-        TextView settings = new TextView(this); //Android 5 can't show ⚙, instead show other icon instead
-        settings.setText(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ? "⚙" : "\uD83D\uDD27");
-        settings.setTextColor(TEXT_COLOR);
-        settings.setTypeface(Typeface.DEFAULT_BOLD);
-        settings.setTextSize(18.0f); //More proportional to compact design
-        RelativeLayout.LayoutParams rlsettings = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
-        rlsettings.addRule(ALIGN_PARENT_RIGHT);
-        settings.setLayoutParams(rlsettings);
-        settings.setOnClickListener(new View.OnClickListener() {
-            boolean settingsOpen;
-
+        //********** Close X button (ImGui style) **********
+        TextView closeButton = new TextView(this);
+        closeButton.setText("✕"); // Clean X symbol for closing
+        closeButton.setTextColor(TEXT_COLOR);
+        closeButton.setTypeface(Typeface.DEFAULT_BOLD);
+        closeButton.setTextSize(16.0f); // Proportional size
+        RelativeLayout.LayoutParams rlClose = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
+        rlClose.addRule(ALIGN_PARENT_RIGHT);
+        closeButton.setLayoutParams(rlClose);
+        closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    settingsOpen = !settingsOpen;
-                    if (settingsOpen) {
-                        scrollView.removeView(patches);
-                        scrollView.addView(mSettings);
-                        scrollView.scrollTo(0, 0);
-                    } else {
-                        scrollView.removeView(mSettings);
-                        scrollView.addView(patches);
-                    }
-                } catch (IllegalStateException e) {
-                }
+                // Hide menu with ImGui-style collapse to thin bar
+                mExpanded.setVisibility(View.GONE);
+                mThinBar.setVisibility(View.VISIBLE);
             }
         });
 
+        //********** ImGui-Style Thin Bar **********
+        mThinBar = new LinearLayout(this);
+        mThinBar.setOrientation(LinearLayout.HORIZONTAL);
+        mThinBar.setVisibility(View.GONE);
+        mThinBar.setBackgroundColor(MENU_BG_COLOR);
+        mThinBar.setPadding(12, 8, 12, 8);
+        mThinBar.setLayoutParams(new LinearLayout.LayoutParams(dp(220), dp(35))); // Thin horizontal bar
+        
+        // Apply premium styling to thin bar
+        GradientDrawable gdThinBar = new GradientDrawable();
+        gdThinBar.setCornerRadius(8f); // Slightly rounded for modern look
+        gdThinBar.setColor(MENU_BG_COLOR);
+        gdThinBar.setStroke(1, Color.parseColor("#5C6BC0")); // Premium border
+        mThinBar.setBackground(gdThinBar);
+        
+        // Menu name text
+        TextView menuName = new TextView(this);
+        menuName.setText("HexCore V1");
+        menuName.setTextColor(TEXT_COLOR);
+        menuName.setTextSize(13.0f);
+        menuName.setTypeface(Typeface.DEFAULT_BOLD);
+        menuName.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT);
+        nameParams.weight = 1.0f; // Take up most space
+        menuName.setLayoutParams(nameParams);
+        
+        // Expand button
+        TextView expandBtn = new TextView(this);
+        expandBtn.setText("‣"); // Arrow to expand
+        expandBtn.setTextColor(TEXT_COLOR);
+        expandBtn.setTextSize(16.0f);
+        expandBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        expandBtn.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams expandParams = new LinearLayout.LayoutParams(dp(30), WRAP_CONTENT);
+        expandBtn.setLayoutParams(expandParams);
+        expandBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Expand to full menu
+                mThinBar.setVisibility(View.GONE);
+                mExpanded.setVisibility(View.VISIBLE);
+            }
+        });
+        
+        mThinBar.addView(menuName);
+        mThinBar.addView(expandBtn);
+        
         //********** Settings **********
         mSettings = new LinearLayout(this);
         mSettings.setOrientation(LinearLayout.VERTICAL);
@@ -278,47 +316,7 @@ public class FloatingModMenuService extends Service {
         relativeLayout.setPadding(12, 6, 12, 6); //Consistent refined padding
         relativeLayout.setVerticalGravity(Gravity.CENTER);
 
-        //**********  Hide/Kill button **********
-        RelativeLayout.LayoutParams lParamsHideBtn = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
-        lParamsHideBtn.addRule(ALIGN_PARENT_LEFT);
-
-        Button hideBtn = new Button(this);
-        hideBtn.setLayoutParams(lParamsHideBtn);
-        hideBtn.setBackgroundColor(Color.TRANSPARENT);
-        hideBtn.setText("HIDE/KILL (Hold)");
-        hideBtn.setTextColor(TEXT_COLOR);
-        hideBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mCollapsed.setVisibility(View.VISIBLE);
-                mCollapsed.setAlpha(0);
-                mExpanded.setVisibility(View.GONE);
-                Toast.makeText(view.getContext(), "Icon hidden. Remember the hidden icon position", Toast.LENGTH_LONG).show();
-            }
-        });
-        hideBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            public boolean onLongClick(View view) {
-                Toast.makeText(view.getContext(), "Menu service killed", Toast.LENGTH_LONG).show();
-                FloatingModMenuService.this.stopSelf();
-                return false;
-            }
-        });
-
-        //********** Close button **********
-        RelativeLayout.LayoutParams lParamsCloseBtn = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
-        lParamsCloseBtn.addRule(ALIGN_PARENT_RIGHT);
-
-        Button closeBtn = new Button(this);
-        closeBtn.setLayoutParams(lParamsCloseBtn);
-        closeBtn.setBackgroundColor(Color.TRANSPARENT);
-        closeBtn.setText("MINIMIZE");
-        closeBtn.setTextColor(TEXT_COLOR);
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mCollapsed.setVisibility(View.VISIBLE);
-                mCollapsed.setAlpha(ICON_ALPHA);
-                mExpanded.setVisibility(View.GONE);
-            }
-        });
+        // Buttons removed for ImGui-style design
 
         //********** Params **********
         //Variable to check later if the phone supports Draw over other apps permission
@@ -328,9 +326,10 @@ public class FloatingModMenuService extends Service {
         params.x = 0;
         params.y = 80; //Slightly higher position for compact design
 
-        //********** Adding view components **********
+        //********** Adding view components (ImGui Style) **********
         rootFrame.addView(mRootContainer);
         mRootContainer.addView(mCollapsed);
+        mRootContainer.addView(mThinBar); // Add thin bar for ImGui-style expansion
         mRootContainer.addView(mExpanded);
         if (IconWebViewData() != null) {
             mCollapsed.addView(wView);
@@ -338,13 +337,12 @@ public class FloatingModMenuService extends Service {
             mCollapsed.addView(startimage);
         }
         titleText.addView(title);
-        titleText.addView(settings);
+        titleText.addView(closeButton); // Updated to use close X button
         mExpanded.addView(titleText);
         mExpanded.addView(heading);
         scrollView.addView(patches);
         mExpanded.addView(scrollView);
-        relativeLayout.addView(hideBtn);
-        relativeLayout.addView(closeBtn);
+        // Buttons removed for clean ImGui-style design
         mExpanded.addView(relativeLayout);
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         mWindowManager.addView(rootFrame, params);
