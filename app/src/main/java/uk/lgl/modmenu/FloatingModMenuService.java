@@ -143,9 +143,9 @@ public class FloatingModMenuService extends Service {
         rootFrame = new FrameLayout(this); // Global markup
         rootFrame.setOnTouchListener(onTouchListener());
         mRootContainer = new RelativeLayout(this); // Markup on which two markups of the icon and the menu itself will be placed
-        mCollapsed = new RelativeLayout(this); // Markup of the icon (when the menu is minimized)
-        mCollapsed.setVisibility(View.VISIBLE);
-        mCollapsed.setAlpha(ICON_ALPHA);
+        // Removed logo - thin bar shows directly
+        mCollapsed = new RelativeLayout(this); // No longer needed but keeping for compatibility
+        mCollapsed.setVisibility(View.GONE); // Hidden permanently
 
         //********** The box of the mod menu **********
         mExpanded = new LinearLayout(this); // Menu markup (when the menu is expanded)
@@ -164,44 +164,9 @@ public class FloatingModMenuService extends Service {
         gdMenuBody.setColors(new int[]{MENU_BG_COLOR, Color.parseColor("#E8121212")});
         mExpanded.setBackground(gdMenuBody); //Apply premium gradient design
 
-        //********** The icon to open mod menu **********
-        startimage = new ImageView(this);
-        startimage.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension = (int) TypedValue.applyDimension(1, ICON_SIZE, getResources().getDisplayMetrics()); //Icon size
-        startimage.getLayoutParams().height = applyDimension;
-        startimage.getLayoutParams().width = applyDimension;
-        //startimage.requestLayout();
-        startimage.setScaleType(ImageView.ScaleType.FIT_XY);
-        byte[] decode = Base64.decode(Icon(), 0);
-        startimage.setImageBitmap(BitmapFactory.decodeByteArray(decode, 0, decode.length));
-        ((ViewGroup.MarginLayoutParams) startimage.getLayoutParams()).topMargin = convertDipToPixels(8); //Refined spacing for compact design
-        //Initialize event handlers for buttons, etc.
-        startimage.setOnTouchListener(onTouchListener());
-        startimage.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // ImGui-style: show thin bar first
-                mCollapsed.setVisibility(View.GONE);
-                mThinBar.setVisibility(View.VISIBLE);
-                mExpanded.setVisibility(View.GONE);
-            }
-        });
+        // Logo removed - thin bar shows directly from start
 
-        //********** The icon in Webview to open mod menu **********
-        WebView wView = new WebView(this); //Icon size width=\"50\" height=\"50\"
-        wView.setLayoutParams(new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        int applyDimension2 = (int) TypedValue.applyDimension(1, ICON_SIZE, getResources().getDisplayMetrics()); //Icon size
-        wView.getLayoutParams().height = applyDimension2;
-        wView.getLayoutParams().width = applyDimension2;
-        wView.loadData("<html>" +
-                "<head></head>" +
-                "<body style=\"margin: 0; padding: 0\">" +
-                "<img src=\"" + IconWebViewData() + "\" width=\"" + ICON_SIZE + "\" height=\"" + ICON_SIZE + "\" >" +
-                "</body>" +
-                "</html>", "text/html", "utf-8");
-        wView.setBackgroundColor(0x00000000); //Transparent
-        wView.setAlpha(ICON_ALPHA);
-        wView.getSettings().setAppCacheEnabled(true);
-        wView.setOnTouchListener(onTouchListener());
+        // WebView logo completely removed - thin bar shows directly
 
         //********** Close X button (ImGui style) **********
         TextView closeButton = new TextView(this);
@@ -224,7 +189,7 @@ public class FloatingModMenuService extends Service {
         //********** ImGui-Style Thin Bar **********
         mThinBar = new LinearLayout(this);
         mThinBar.setOrientation(LinearLayout.HORIZONTAL);
-        mThinBar.setVisibility(View.GONE);
+        mThinBar.setVisibility(View.VISIBLE); // Show thin bar immediately from start
         mThinBar.setBackgroundColor(MENU_BG_COLOR);
         mThinBar.setPadding(12, 8, 12, 8);
         mThinBar.setLayoutParams(new LinearLayout.LayoutParams(dp(220), dp(35))); // Thin horizontal bar
@@ -337,11 +302,7 @@ public class FloatingModMenuService extends Service {
         mRootContainer.addView(mCollapsed);
         mRootContainer.addView(mThinBar); // Add thin bar for ImGui-style expansion
         mRootContainer.addView(mExpanded);
-        if (IconWebViewData() != null) {
-            mCollapsed.addView(wView);
-        } else {
-            mCollapsed.addView(startimage);
-        }
+        // Logo components completely removed - thin bar shows directly
         titleText.addView(title);
         titleText.addView(closeButton); // Updated to use close X button
         mExpanded.addView(titleText);
