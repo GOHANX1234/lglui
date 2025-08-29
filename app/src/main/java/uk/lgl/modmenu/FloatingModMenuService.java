@@ -69,26 +69,27 @@ public class FloatingModMenuService extends Service {
 
     //region Variable
     public static final String TAG = "Mod_Menu"; //Tag for logcat
-    int TEXT_COLOR = Color.parseColor("#82CAFD");
-    int TEXT_COLOR_2 = Color.parseColor("#FFFFFF");
-    int BTN_COLOR = Color.parseColor("#1C262D");
-    int MENU_BG_COLOR = Color.parseColor("#EE1C2A35"); //#AARRGGBB
-    int MENU_FEATURE_BG_COLOR = Color.parseColor("#DD141C22"); //#AARRGGBB
-    int MENU_WIDTH = 290;
-    int MENU_HEIGHT = 210;
-    float MENU_CORNER = 4f;
-    int ICON_SIZE = 45; //Change both width and height of image
-    float ICON_ALPHA = 0.7f; //Transparent
-    int ToggleON = Color.GREEN;
-    int ToggleOFF = Color.RED;
-    int BtnON = Color.parseColor("#1b5e20");
-    int BtnOFF = Color.parseColor("#7f0000");
-    int CategoryBG = Color.parseColor("#2F3D4C");
-    int SeekBarColor = Color.parseColor("#80CBC4");
-    int SeekBarProgressColor = Color.parseColor("#80CBC4");
-    int CheckBoxColor = Color.parseColor("#80CBC4");
-    int RadioColor = Color.parseColor("#FFFFFF");
-    String NumberTxtColor = "#41c300";
+    // ********** PREMIUM UI COLOR SCHEME **********
+    int TEXT_COLOR = Color.parseColor("#E8EAF6");                    // Premium light purple-white
+    int TEXT_COLOR_2 = Color.parseColor("#FFFFFF");                  // Pure white for contrast
+    int BTN_COLOR = Color.parseColor("#283593");                     // Premium deep blue
+    int MENU_BG_COLOR = Color.parseColor("#F0121212");               // Premium dark with high transparency
+    int MENU_FEATURE_BG_COLOR = Color.parseColor("#E0181818");       // Slightly lighter dark background
+    int MENU_WIDTH = 250;                                            // Reduced width for compact design
+    int MENU_HEIGHT = 180;                                           // Reduced height for compact design
+    float MENU_CORNER = 12f;                                         // Modern rounded corners
+    int ICON_SIZE = 40;                                              // Slightly smaller, more refined icon
+    float ICON_ALPHA = 0.85f;                                       // More visible but elegant
+    int ToggleON = Color.parseColor("#4CAF50");                      // Premium green
+    int ToggleOFF = Color.parseColor("#F44336");                     // Premium red
+    int BtnON = Color.parseColor("#2E7D32");                         // Premium dark green
+    int BtnOFF = Color.parseColor("#C62828");                        // Premium dark red
+    int CategoryBG = Color.parseColor("#37474F");                    // Premium blue-gray
+    int SeekBarColor = Color.parseColor("#5C6BC0");                  // Premium indigo
+    int SeekBarProgressColor = Color.parseColor("#3F51B5");          // Premium indigo accent
+    int CheckBoxColor = Color.parseColor("#7986CB");                 // Premium light indigo
+    int RadioColor = Color.parseColor("#E8EAF6");                    // Consistent with text color
+    String NumberTxtColor = "#66BB6A";                              // Premium green for numbers
     //********************************************************************//
     RelativeLayout mCollapsed, mRootContainer;
     LinearLayout mExpanded, patches, mSettings, mCollapse;
@@ -153,11 +154,15 @@ public class FloatingModMenuService extends Service {
         mExpanded.setOrientation(LinearLayout.VERTICAL);
         // mExpanded.setPadding(1, 1, 1, 1); //So borders would be visible
         mExpanded.setLayoutParams(new LinearLayout.LayoutParams(dp(MENU_WIDTH), WRAP_CONTENT));
+        // ********** PREMIUM GRADIENT DESIGN **********
         GradientDrawable gdMenuBody = new GradientDrawable();
-        gdMenuBody.setCornerRadius(MENU_CORNER); //Set corner
-        gdMenuBody.setColor(MENU_BG_COLOR); //Set background color
-        gdMenuBody.setStroke(1, Color.parseColor("#32cb00")); //Set border
-        //mExpanded.setBackground(gdMenuBody); //Apply GradientDrawable to it
+        gdMenuBody.setCornerRadius(MENU_CORNER); //Modern rounded corners
+        gdMenuBody.setColor(MENU_BG_COLOR); //Premium dark background
+        gdMenuBody.setStroke(2, Color.parseColor("#5C6BC0")); //Premium indigo border - thicker and more elegant
+        gdMenuBody.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+        // Create subtle gradient effect for premium look
+        gdMenuBody.setColors(new int[]{MENU_BG_COLOR, Color.parseColor("#E8121212")});
+        mExpanded.setBackground(gdMenuBody); //Apply premium gradient design
 
         //********** The icon to open mod menu **********
         startimage = new ImageView(this);
@@ -169,7 +174,7 @@ public class FloatingModMenuService extends Service {
         startimage.setScaleType(ImageView.ScaleType.FIT_XY);
         byte[] decode = Base64.decode(Icon(), 0);
         startimage.setImageBitmap(BitmapFactory.decodeByteArray(decode, 0, decode.length));
-        ((ViewGroup.MarginLayoutParams) startimage.getLayoutParams()).topMargin = convertDipToPixels(10);
+        ((ViewGroup.MarginLayoutParams) startimage.getLayoutParams()).topMargin = convertDipToPixels(8); //Refined spacing for compact design
         //Initialize event handlers for buttons, etc.
         startimage.setOnTouchListener(onTouchListener());
         startimage.setOnClickListener(new View.OnClickListener() {
@@ -201,7 +206,7 @@ public class FloatingModMenuService extends Service {
         settings.setText(Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M ? "⚙" : "\uD83D\uDD27");
         settings.setTextColor(TEXT_COLOR);
         settings.setTypeface(Typeface.DEFAULT_BOLD);
-        settings.setTextSize(20.0f);
+        settings.setTextSize(18.0f); //More proportional to compact design
         RelativeLayout.LayoutParams rlsettings = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         rlsettings.addRule(ALIGN_PARENT_RIGHT);
         settings.setLayoutParams(rlsettings);
@@ -232,12 +237,12 @@ public class FloatingModMenuService extends Service {
 
         //********** Title text **********
         RelativeLayout titleText = new RelativeLayout(this);
-        titleText.setPadding(10, 5, 10, 5);
+        titleText.setPadding(12, 8, 12, 8); //More refined padding for compact design
         titleText.setVerticalGravity(16);
 
         TextView title = new TextView(this);
         title.setTextColor(TEXT_COLOR);
-        title.setTextSize(18.0f);
+        title.setTextSize(16.0f); //Slightly smaller for refined look
         title.setGravity(Gravity.CENTER);
         RelativeLayout.LayoutParams rl = new RelativeLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT);
         rl.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -252,9 +257,9 @@ public class FloatingModMenuService extends Service {
         heading.setSingleLine(true);
         heading.setSelected(true);
         heading.setTextColor(TEXT_COLOR);
-        heading.setTextSize(10.0f);
+        heading.setTextSize(11.0f); //Better readability
         heading.setGravity(Gravity.CENTER);
-        heading.setPadding(0, 0, 0, 5);
+        heading.setPadding(0, 0, 0, 8); //Better spacing for refined look
         setHeadingText(heading);
 
         //********** Mod menu feature list **********
@@ -270,7 +275,7 @@ public class FloatingModMenuService extends Service {
 
         //********** RelativeLayout for buttons **********
         RelativeLayout relativeLayout = new RelativeLayout(this);
-        relativeLayout.setPadding(10, 3, 10, 3);
+        relativeLayout.setPadding(12, 6, 12, 6); //Consistent refined padding
         relativeLayout.setVerticalGravity(Gravity.CENTER);
 
         //**********  Hide/Kill button **********
@@ -321,7 +326,7 @@ public class FloatingModMenuService extends Service {
         params = new WindowManager.LayoutParams(WRAP_CONTENT, WRAP_CONTENT, iparams, 8, -3);
         params.gravity = 51;
         params.x = 0;
-        params.y = 100;
+        params.y = 80; //Slightly higher position for compact design
 
         //********** Adding view components **********
         rootFrame.addView(mRootContainer);
@@ -526,7 +531,7 @@ public class FloatingModMenuService extends Service {
         }
         switchR.setText(featName);
         switchR.setTextColor(TEXT_COLOR_2);
-        switchR.setPadding(10, 5, 0, 5);
+        switchR.setPadding(12, 6, 0, 6); //Premium consistent padding
         switchR.setChecked(Preferences.loadPrefBool(featName, featNum, swiOn));
         switchR.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton compoundButton, boolean bool) {

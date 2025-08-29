@@ -2,6 +2,30 @@ modules = ["cpp-clang14", "java-graalvm22.3", "c-clang14"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["gradle"]
 
 [agent]
 expertMode = true
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Android Build"
+
+[[workflows.workflow]]
+name = "Android Build"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "./gradlew --no-daemon build"
+
+[workflows.workflow.metadata]
+outputType = "console"
