@@ -2,6 +2,8 @@
 
 package uk.lgl.modmenu;
 
+import android.webkit.WebView;
+import android.webkit.WebSettings;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
@@ -935,7 +937,7 @@ public class FloatingModMenuService extends Service {
         wView.loadData(text, "text/html", "utf-8");
         wView.setBackgroundColor(0x00000000); //Transparent
         wView.setPadding(0, 5, 0, 5);
-        wView.getSettings().setAppCacheEnabled(false);
+        wView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         return wView;
     }
 
