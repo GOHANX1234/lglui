@@ -236,25 +236,14 @@ public class FloatingModMenuService extends Service {
         gdThinBar.setStroke(1, Color.parseColor("#5C6BC0")); // Premium border
         mThinBar.setBackground(gdThinBar);
         
-        // Menu name text
-        TextView menuName = new TextView(this);
-        menuName.setText("HexCore V1");
-        menuName.setTextColor(TEXT_COLOR);
-        menuName.setTextSize(13.0f);
-        menuName.setTypeface(Typeface.DEFAULT_BOLD);
-        menuName.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT);
-        nameParams.weight = 1.0f; // Take up most space
-        menuName.setLayoutParams(nameParams);
-        
-        // Expand button
+        // Expand button (at the beginning)
         TextView expandBtn = new TextView(this);
-        expandBtn.setText("‣"); // Arrow to expand
+        expandBtn.setText("‣"); // Arrow to expand - positioned first
         expandBtn.setTextColor(TEXT_COLOR);
         expandBtn.setTextSize(16.0f);
         expandBtn.setTypeface(Typeface.DEFAULT_BOLD);
         expandBtn.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams expandParams = new LinearLayout.LayoutParams(dp(30), WRAP_CONTENT);
+        LinearLayout.LayoutParams expandParams = new LinearLayout.LayoutParams(dp(35), WRAP_CONTENT);
         expandBtn.setLayoutParams(expandParams);
         expandBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,8 +254,25 @@ public class FloatingModMenuService extends Service {
             }
         });
         
-        mThinBar.addView(menuName);
-        mThinBar.addView(expandBtn);
+        // Menu name text (centered)
+        TextView menuName = new TextView(this);
+        menuName.setText("HexCore V1");
+        menuName.setTextColor(TEXT_COLOR);
+        menuName.setTextSize(13.0f);
+        menuName.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD)); // Premium font
+        menuName.setGravity(Gravity.CENTER); // Center the text perfectly
+        LinearLayout.LayoutParams nameParams = new LinearLayout.LayoutParams(0, WRAP_CONTENT);
+        nameParams.weight = 1.0f; // Take up remaining space for centering
+        menuName.setLayoutParams(nameParams);
+        
+        // Empty spacer for perfect centering
+        TextView spacer = new TextView(this);
+        LinearLayout.LayoutParams spacerParams = new LinearLayout.LayoutParams(dp(35), WRAP_CONTENT);
+        spacer.setLayoutParams(spacerParams);
+        
+        mThinBar.addView(expandBtn); // Play button first
+        mThinBar.addView(menuName); // Text in center
+        mThinBar.addView(spacer); // Spacer for perfect balance
         
         //********** Settings **********
         mSettings = new LinearLayout(this);
